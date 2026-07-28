@@ -1,0 +1,63 @@
+= Быстрый старт
+
+Этот раздел поможет сделать первый запрос к CRM Leads API за несколько минут.
+
+== Базовый URL
+
+[source]
+----
+https://api.example-crm.dev/v1
+----
+
+== Шаг 1. Получите токен доступа
+
+Все запросы к API требуют аутентификации. Получите токен, как описано в
+xref:guides/authentication.adoc[разделе «Аутентификация»].
+
+== Шаг 2. Сделайте первый запрос
+
+Получите список лидов:
+
+[source,bash]
+----
+curl -X GET "https://api.example-crm.dev/v1/leads" \
+  -H "Authorization: Bearer <ваш_токен>" \
+  -H "Accept: application/json"
+----
+
+Пример ответа:
+
+[source,json]
+----
+{
+  "items": [
+    {
+      "id": "ld_1001",
+      "fullName": "Иван Петров",
+      "email": "ivan.petrov@example.com",
+      "status": "new",
+      "createdAt": "2026-07-20T10:15:00Z"
+    }
+  ],
+  "page": 1,
+  "pageSize": 20,
+  "totalItems": 1
+}
+----
+
+== Шаг 3. Создайте лид
+
+[source,bash]
+----
+curl -X POST "https://api.example-crm.dev/v1/leads" \
+  -H "Authorization: Bearer <ваш_токен>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName": "Мария Иванова",
+    "email": "maria.ivanova@example.com",
+    "source": "website_form"
+  }'
+----
+
+Что дальше — см. xref:api/overview.adoc[полный обзор API] или
+xref:api/use-cases/lead-integration.adoc[сквозной сценарий использования].

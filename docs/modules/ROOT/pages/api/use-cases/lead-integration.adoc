@@ -1,0 +1,53 @@
+= UseCase: от заявки на сайте до квалифицированного лида
+
+Этот сценарий показывает типичный путь интеграции: как получить токен, создать лид
+из веб-формы и провести его через статусы.
+
+== Шаг 1. Получить токен доступа
+
+[source,bash]
+----
+curl -X POST "https://api.example-crm.dev/v1/auth/token" \
+  -H "Content-Type: application/json" \
+  -d '{"clientId": "web-form-integration", "clientSecret": "***"}'
+----
+
+== Шаг 2. Создать лид при отправке формы на сайте
+
+[source,bash]
+----
+curl -X POST "https://api.example-crm.dev/v1/leads" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName": "Алексей Смирнов",
+    "email": "a.smirnov@example.com",
+    "source": "website_form"
+  }'
+----
+
+Лид создан со статусом `new`, ID — `ld_2001`.
+
+== Шаг 3. Менеджер берёт лид в работу
+
+[source,bash]
+----
+curl -X PATCH "https://api.example-crm.dev/v1/leads/ld_2001" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "in_progress"}'
+----
+
+== Шаг 4. После звонка лид квалифицируют
+
+[source,bash]
+----
+curl -X PATCH "https://api.example-crm.dev/v1/leads/ld_2001" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "qualified"}'
+----
+
+== Итог
+
+В системе создан лид с историей статусов `new → in_progress → qualified`.

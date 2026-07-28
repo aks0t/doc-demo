@@ -1,0 +1,57 @@
+= Аутентификация
+
+CRM Leads API использует схему OAuth 2.0 Client Credentials. Каждый запрос к защищённым
+эндпоинтам должен содержать заголовок `Authorization: Bearer <token>`.
+
+== Получение токена
+
+[source,bash]
+----
+curl -X POST "https://api.example-crm.dev/v1/auth/token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "clientId": "your-client-id",
+    "clientSecret": "your-client-secret"
+  }'
+----
+
+Пример ответа:
+
+[source,json]
+----
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+  "tokenType": "Bearer",
+  "expiresIn": 3600
+}
+----
+
+[WARNING]
+====
+Токен действителен 3600 секунд (1 час). После истечения срока действия запрашивайте новый —
+API не поддерживает refresh-токены в текущей версии.
+====
+
+== Использование токена
+
+Добавьте заголовок к каждому запросу:
+
+[source]
+----
+Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
+----
+
+== Возможные ошибки аутентификации
+
+[cols="1,3"]
+|===
+| Код | Описание
+
+| 401 Unauthorized
+| Токен отсутствует, истёк или недействителен.
+
+| 403 Forbidden
+| Токен валиден, но у клиента нет прав на операцию.
+|===
+
+Полный список кодов ошибок — на странице xref:api/errors.adoc[Ошибки и коды состояния].

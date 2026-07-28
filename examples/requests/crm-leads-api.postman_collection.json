@@ -1,0 +1,70 @@
+{
+  "info": {
+    "name": "CRM Leads API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get token",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/token",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clientId\": \"your-client-id\",\n  \"clientSecret\": \"your-client-secret\"\n}"
+        }
+      }
+    },
+    {
+      "name": "List leads",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/leads?status=new&page=1"
+      }
+    },
+    {
+      "name": "Create lead",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/leads",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Мария Иванова\",\n  \"email\": \"maria.ivanova@example.com\",\n  \"source\": \"website_form\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Update lead status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/leads/ld_1001",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"qualified\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Delete lead",
+      "request": {
+        "method": "DELETE",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/leads/ld_1001"
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "https://api.example-crm.dev/v1" },
+    { "key": "token", "value": "" }
+  ]
+}

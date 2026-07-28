@@ -1,0 +1,191 @@
+openapi: 3.0.3
+info:
+  title: CRM Leads API
+  version: "1.0"
+  description: Сгенерированный демонстрационный REST API для управления лидами в учебной XRM-платформе.
+servers:
+  - url: https://api.example-crm.dev/v1
+paths:
+  /auth/token:
+    post:
+      summary: Получить токен доступа
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clientId, clientSecret]
+              properties:
+                clientId:
+                  type: string
+                clientSecret:
+                  type: string
+      responses:
+        "200":
+          description: Токен успешно выдан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  tokenType:
+                    type: string
+                  expiresIn:
+                    type: integer
+  /leads:
+    get:
+      summary: Список лидов
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [new, in_progress, qualified, closed]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Постраничный список лидов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Lead"
+                  page:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  totalItems:
+                    type: integer
+    post:
+      summary: Создать лид
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeadCreateRequest"
+      responses:
+        "201":
+          description: Лид создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lead"
+        "409":
+          description: Лид с таким email уже существует
+  /leads/{id}:
+    get:
+      summary: Получить лид по ID
+      parameters:
+        - $ref: "#/components/parameters/LeadId"
+      responses:
+        "200":
+          description: Лид найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lead"
+        "404":
+          description: Лид не найден
+    patch:
+      summary: Обновить лид
+      parameters:
+        - $ref: "#/components/parameters/LeadId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeadUpdateRequest"
+      responses:
+        "200":
+          description: Лид обновлён
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lead"
+    delete:
+      summary: Удалить лид
+      parameters:
+        - $ref: "#/components/parameters/LeadId"
+      responses:
+        "204":
+          description: Лид удалён
+        "404":
+          description: Лид не найден
+components:
+  parameters:
+    LeadId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    Lead:
+      type: object
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        source:
+          type: string
+          enum: [website_form, phone_call, partner, manual]
+        status:
+          type: string
+          enum: [new, in_progress, qualified, closed]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    LeadCreateRequest:
+      type: object
+      required: [fullName, email]
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        source:
+          type: string
+          enum: [website_form, phone_call, partner, manual]
+    LeadUpdateRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [new, in_progress, qualified, closed]
+        phone:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+security:
+  - bearerAuth: []

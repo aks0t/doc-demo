@@ -1,0 +1,322 @@
+= Leads
+
+Ресурс `leads` описывает потенциальных клиентов (лидов), полученных из разных источников
+(веб-форма, звонок, партнёр и т.д.).
+
+== Модель данных
+
+[cols="1,1,1,3"]
+|===
+| Поле | Тип | Обязательное | Описание
+
+| `id`
+| string
+| —
+| Идентификатор лида, генерируется сервером. Формат: `ld_XXXX`.
+
+| `fullName`
+| string
+| Да
+| Полное имя лида.
+
+| `email`
+| string
+| Да
+| Email лида. Должен быть уникальным в рамках аккаунта.
+
+| `phone`
+| string
+| Нет
+| Телефон в формате E.164, например `+79991234567`.
+
+| `source`
+| string
+| Нет
+| Источник лида: `website_form`, `phone_call`, `partner`, `manual`. По умолчанию `manual`.
+
+| `status`
+| string
+| —
+| Статус лида: `new`, `in_progress`, `qualified`, `closed`. Управляется через `PATCH`.
+
+| `createdAt`
+| string (date-time)
+| —
+| Дата создания, генерируется сервером.
+
+| `updatedAt`
+| string (date-time)
+| —
+| Дата последнего обновления, генерируется сервером.
+|===
+
+== `GET /leads`
+
+Возвращает постраничный список лидов.
+
+=== Query-параметры
+
+[cols="1,1,3"]
+|===
+| Параметр | Тип | Описание
+
+| `status`
+| string
+| Фильтр по статусу (`new`, `in_progress`, `qualified`, `closed`).
+
+| `page`
+| integer
+| Номер страницы. По умолчанию `1`.
+
+| `pageSize`
+| integer
+| Размер страницы. По умолчанию `20`.
+|===
+
+=== Пример запроса
+
+[source,bash]
+----
+curl -X GET "https://api.example-crm.dev/v1/leads?status=new&page=1" \
+  -H "Authorization: Bearer <token>"
+----
+
+=== Пример ответа `200 OK`
+
+[source,json]
+----
+{
+  "items": [
+    {
+      "id": "ld_1001",
+      "fullName": "Иван Петров",
+      "email": "ivan.petrov@example.com",
+      "phone": "+79991234567",
+      "source": "website_form",
+      "status": "new",
+      "createdAt": "2026-07-20T10:15:00Z",
+      "updatedAt": "2026-07-20T10:15:00Z"
+    }
+  ],
+  "page": 1,
+  "pageSize": 20,
+  "totalItems": 1
+}
+----
+
+== `POST /leads`
+
+Создаёт новый лид.
+
+=== Тело запроса
+
+[source,json]
+----
+{
+  "fullName": "Мария Иванова",
+  "email": "maria.ivanova@example.com",
+  "phone": "+79997654321",
+  "source": "website_form"
+}
+----
+
+=== Пример запроса
+
+[source,bash]
+----
+curl -X POST "https://api.example-crm.dev/v1/leads" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName": "Мария Иванова",
+    "email": "maria.ivanova@example.com",
+    "phone": "+79997654321",
+    "source": "website_form"
+  }'
+----
+
+=== Пример ответа `201 Created`
+
+[source,json]
+----
+{
+  "id": "ld_1002",
+  "fullName": "Мария Иванова",
+  "email": "maria.ivanova@example.com",
+  "phone": "+79997654321",
+  "source": "website_form",
+  "status": "new",
+  "createdAt": "2026-07-27T09:00:00Z",
+  "updatedAt": "2026-07-27T09:00:00Z"
+}
+----
+
+=== Возможные ошибки
+
+[cols="1,1,3"]
+|===
+| Код | Описание | Пример
+
+| `400 Bad Request`
+| Невалидные данные (например, отсутствует обязательное поле или неверный формат телефона).
+| `{"error": "Invalid email format"}`
+
+| `409 Conflict`
+| Лид с таким `email` уже существует в рамках аккаунта.
+| `{"error": "Email already exists"}`
+|===
+
+== `GET /leads/\{id\}`
+
+Возвращает лид по идентификатору.
+
+=== Path-параметры
+
+[cols="1,1,3"]
+|===
+| Параметр | Тип | Описание
+
+| `id`
+| string
+| Идентификатор лида, например `ld_1001`.
+|===
+
+=== Пример запроса
+
+[source,bash]
+----
+curl -X GET "https://api.example-crm.dev/v1/leads/ld_1001" \
+  -H "Authorization: Bearer <token>"
+----
+
+=== Пример ответа `200 OK`
+
+[source,json]
+----
+{
+  "id": "ld_1001",
+  "fullName": "Иван Петров",
+  "email": "ivan.petrov@example.com",
+  "phone": "+79991234567",
+  "source": "website_form",
+  "status": "new",
+  "createdAt": "2026-07-20T10:15:00Z",
+  "updatedAt": "2026-07-20T10:15:00Z"
+}
+----
+
+=== Возможные ошибки
+
+[cols="1,1,3"]
+|===
+| Код | Описание | Пример
+
+| `404 Not Found`
+| Лид с указанным `id` не найден.
+| `{"error": "Lead not found"}`
+|===
+
+== `PATCH /leads/\{id\}`
+
+Обновляет статус или контактные данные лида. Поддерживает частичное обновление.
+
+=== Path-параметры
+
+[cols="1,1,3"]
+|===
+| Параметр | Тип | Описание
+
+| `id`
+| string
+| Идентификатор лида, например `ld_1001`.
+|===
+
+=== Тело запроса
+
+[source,json]
+----
+{
+  "status": "qualified"
+}
+----
+
+=== Пример запроса
+
+[source,bash]
+----
+curl -X PATCH "https://api.example-crm.dev/v1/leads/ld_1001" \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "qualified"
+  }'
+----
+
+=== Пример ответа `200 OK`
+
+[source,json]
+----
+{
+  "id": "ld_1001",
+  "fullName": "Иван Петров",
+  "email": "ivan.petrov@example.com",
+  "phone": "+79991234567",
+  "source": "website_form",
+  "status": "qualified",
+  "createdAt": "2026-07-20T10:15:00Z",
+  "updatedAt": "2026-07-27T09:05:00Z"
+}
+----
+
+=== Возможные ошибки
+
+[cols="1,1,3"]
+|===
+| Код | Описание | Пример
+
+| `400 Bad Request`
+| Невалидные данные (например, недопустимое значение `status`).
+| `{"error": "Invalid status value"}`
+
+| `404 Not Found`
+| Лид с указанным `id` не найден.
+| `{"error": "Lead not found"}`
+|===
+
+== `DELETE /leads/\{id\}`
+
+Удаляет лид.
+
+=== Path-параметры
+
+[cols="1,1,3"]
+|===
+| Параметр | Тип | Описание
+
+| `id`
+| string
+| Идентификатор лида, например `ld_1001`.
+|===
+
+=== Пример запроса
+
+[source,bash]
+----
+curl -X DELETE "https://api.example-crm.dev/v1/leads/ld_1001" \
+  -H "Authorization: Bearer <token>"
+----
+
+=== Возможные ошибки
+
+[cols="1,1,3"]
+|===
+| Код | Описание | Пример
+
+| `204 No Content`
+| Лид успешно удалён. Тело ответа отсутствует.
+|
+
+| `404 Not Found`
+| Лид с указанным `id` не найден.
+|
+|===

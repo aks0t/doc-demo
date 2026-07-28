@@ -1,0 +1,14 @@
+* xref:index.adoc[Обзор]
+* Руководства
+** xref:guides/getting-started.adoc[Быстрый старт]
+** xref:guides/authentication.adoc[Аутентификация]
+* API Reference
+** xref:api/overview.adoc[Обзор API]
+** xref:api/errors.adoc[Ошибки и коды состояния]
+** Endpoints
+*** xref:api/endpoints/auth.adoc[Auth]
+*** xref:api/endpoints/leads.adoc[Leads]
+** UseCases
+*** xref:api/use-cases/lead-integration.adoc
+* Стандарты
+** xref:standarts/endpoint-standart.adoc[Стандарты документации]

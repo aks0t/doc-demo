@@ -1,0 +1,100 @@
+= Аутентификация (токен доступа)
+
+Эндпоинт `/auth/token` используется для получения JWT-токена, который требуется для
+авторизации всех остальных запросов API.
+
+== `POST /auth/token`
+
+Выдаёт JWT-токен по идентификатору и секретному ключу клиента.
+
+=== Тело запроса
+
+[cols="1,1,1,3"]
+|===
+| Поле | Тип | Обязательное | Описание
+
+| `clientId`
+| string
+| Да
+| Идентификатор клиента, выданный при регистрации.
+
+| `clientSecret`
+| string
+| Да
+| Секретный ключ клиента.
+|===
+
+=== Пример запроса
+
+[source,bash]
+----
+curl -X POST "https://api.example-crm.dev/v1/auth/token" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "clientId": "your-client-id",
+    "clientSecret": "your-client-secret"
+  }'
+----
+
+=== Пример ответа `200 OK`
+
+[source,json]
+----
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tokenType": "Bearer",
+  "expiresIn": 3600
+}
+----
+
+=== Поля ответа
+
+[cols="1,1,3"]
+|===
+| Поле | Тип | Описание
+
+| `accessToken`
+| string
+| JWT-токен для авторизации.
+
+| `tokenType`
+| string
+| Тип токена, всегда `Bearer`.
+
+| `expiresIn`
+| integer
+| Время жизни токена в секундах (например, `3600` = 1 час).
+|===
+
+=== Возможные ошибки
+
+[cols="1,1,3"]
+|===
+| Код | Описание | Пример
+
+| `400 Bad Request`
+| Отсутствуют обязательные поля или неверный формат JSON.
+| `{"error": "Missing clientId"}`
+
+| `401 Unauthorized`
+| Неверные `clientId` или `clientSecret`.
+| `{"error": "Invalid credentials"}`
+|===
+
+== Использование токена
+
+Полученный токен необходимо передавать в заголовке `Authorization` для всех защищённых
+эндпоинтов:
+
+[source,http]
+----
+Authorization: Bearer <accessToken>
+----
+
+Например:
+
+[source,bash]
+----
+curl -X GET "https://api.example-crm.dev/v1/leads" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+----

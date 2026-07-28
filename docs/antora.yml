@@ -1,0 +1,5 @@
+name: crm-leads-api
+title: Dummy CRM Leads API
+version: '1.0'
+nav:
+  - modules/ROOT/nav.adoc
