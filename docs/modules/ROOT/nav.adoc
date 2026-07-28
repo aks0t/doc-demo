@@ -9,6 +9,6 @@
 *** xref:api/endpoints/auth.adoc[Auth]
 *** xref:api/endpoints/leads.adoc[Leads]
 ** UseCases
-*** xref:api/use-cases/lead-integration.adoc
+*** xref:api/use-cases/lead-integration.adoc[Интеграция лида]
 * Стандарты
-** xref:standarts/endpoint-standart.adoc[Стандарты документации]
+** xref:standarts/endpoint-standart.adoc[Документация эндпоинтов]

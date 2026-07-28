@@ -1,6 +1,6 @@
 = Обзор API
 
-== Конвенции
+== Общие сведения
 
 * Базовый URL: `https://api.example-crm.dev/v1`
 * Формат данных: JSON (`Content-Type: application/json`)
@@ -31,8 +31,13 @@
 |===
 | Ресурс | Описание
 
+| xref:api/endpoints/auth.adoc[Auth]
+| Управление авторизацией.
+
+
 | xref:api/endpoints/leads.adoc[Leads]
 | Создание, получение, обновление и удаление лидов.
+
 |===
 
 == Коды состояния

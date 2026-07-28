@@ -60,4 +60,4 @@ curl -X POST "https://api.example-crm.dev/v1/leads" \
 ----
 
 Что дальше — см. xref:api/overview.adoc[полный обзор API] или
-xref:api/use-cases/lead-integration.adoc[сквозной сценарий использования].
+xref:api/use-cases/lead-integration.adoc[UseCase интеграции лида].
