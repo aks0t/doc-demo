@@ -158,12 +158,12 @@ curl -X POST "https://api.example-crm.dev/v1/leads" \
 | Код | Описание | Пример
 
 | `400 Bad Request`
-| Невалидные данные (например, отсутствует обязательное поле или неверный формат телефона).
-| `{"error": "Invalid email format"}`
+| Невалидные данные.
+| `{"error": {"code": "validation_error", "message": "Invalid email format", "field": "email"}}`
 
 | `409 Conflict`
-| Лид с таким `email` уже существует в рамках аккаунта.
-| `{"error": "Email already exists"}`
+| Лид с таким `email` уже существует.
+| `{"error": {"code": "duplicate_email", "message": "Email already exists", "field": "email"}}`
 |===
 
 == `GET /leads/\{id\}`
@@ -213,7 +213,7 @@ curl -X GET "https://api.example-crm.dev/v1/leads/ld_1001" \
 
 | `404 Not Found`
 | Лид с указанным `id` не найден.
-| `{"error": "Lead not found"}`
+| `{"error": {"code": "lead_not_found", "message": "Lead not found", "field": "id"}}`
 |===
 
 == `PATCH /leads/\{id\}`
@@ -276,11 +276,11 @@ curl -X PATCH "https://api.example-crm.dev/v1/leads/ld_1001" \
 
 | `400 Bad Request`
 | Невалидные данные (например, недопустимое значение `status`).
-| `{"error": "Invalid status value"}`
+| `{"error": {"code": "validation_error", "message": "Invalid status value", "field": "status"}}`
 
 | `404 Not Found`
 | Лид с указанным `id` не найден.
-| `{"error": "Lead not found"}`
+| `{"error": {"code": "lead_not_found", "message": "Lead not found", "field": "id"}}`
 |===
 
 == `DELETE /leads/\{id\}`
@@ -318,5 +318,5 @@ curl -X DELETE "https://api.example-crm.dev/v1/leads/ld_1001" \
 
 | `404 Not Found`
 | Лид с указанным `id` не найден.
-|
+| `{"error": {"code": "lead_not_found", "message": "Lead not found", "field": "id"}}`
 |===

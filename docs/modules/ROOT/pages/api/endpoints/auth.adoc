@@ -74,11 +74,11 @@ curl -X POST "https://api.example-crm.dev/v1/auth/token" \
 
 | `400 Bad Request`
 | Отсутствуют обязательные поля или неверный формат JSON.
-| `{"error": "Missing clientId"}`
+| `{"error": {"code": "validation_error", "message": "Missing clientId", "field": "clientId"}}`
 
 | `401 Unauthorized`
 | Неверные `clientId` или `clientSecret`.
-| `{"error": "Invalid credentials"}`
+| `{"error": {"code": "invalid_credentials", "message": "Invalid credentials"}}`
 |===
 
 == Использование токена
