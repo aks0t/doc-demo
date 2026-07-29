@@ -55,3 +55,22 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIs...
 |===
 
 Полный список кодов ошибок — на странице xref:api/errors.adoc[Ошибки и коды состояния].
+
+== Диаграмма потока
+
+[mermaid]
+....
+sequenceDiagram
+    participant Client
+    participant API
+
+    Client->>API: POST /auth/token (clientId, clientSecret)
+    API-->>Client: 200 OK { "accessToken": "...", "tokenType": "Bearer", "expiresIn": 3600 }
+
+    Note over Client: сохранить accessToken
+
+    Client->>API: GET /leads Authorization: Bearer <accessToken>
+    API-->>Client: 200 OK (данные лидов)
+
+    Note over Client: использовать токен до истечения срока
+....

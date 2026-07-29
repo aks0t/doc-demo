@@ -23,8 +23,8 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install Antora
-        run: npm install @antora/cli@3 @antora/site-generator@3
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build site
         run: npx antora antora-playbook.yml
