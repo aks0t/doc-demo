@@ -1,0 +1,45 @@
+= Архитектура пайплайна документации
+
+Описан процесс сборки и доставки документации от пуша в Git до публикации на GitHub Pages.
+
+== Диаграмма развертывания
+
+[mermaid, width=1200]
+....
+flowchart LR
+    A[Разработчик пушит в main] --> B[GitHub Actions: workflow Publish Docs]
+
+    subgraph build[Сборка]
+        B --> C[Checkout репозитория]
+        C --> D[Установка Node.js 20]
+        D --> E[npm ci]
+        E --> F[Ожидание Kroki<br/>health-check]
+        F --> G[Antora сборка сайта]
+        G --> H[Загрузка артефакта<br/>upload-pages-artifact]
+    end
+
+    H --> I[Деплой]
+
+    subgraph deploy[Деплой]
+        I --> J[deploy-pages]
+        J --> K[GitHub Pages]
+    end
+
+    K --> L[Пользователи видят документацию]
+
+    subgraph Services[Сервис-контейнеры Docker]
+        S1[Kroki:8000]
+        S2[mermaid]
+        S3[bpmn]
+    end
+
+    F -.- S1
+
+    %% Failure paths
+    E -.->|Ошибка| M[Build failed]
+    F -.->|Ошибка| M
+    G -.->|Ошибка| M
+    J -.->|Ошибка| N[Deploy failed]
+    M --> O[Уведомление разработчика]
+    N --> O
+....

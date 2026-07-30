@@ -12,3 +12,5 @@
 *** xref:api/use-cases/lead-integration.adoc[Интеграция лида]
 * Стандарты
 ** xref:standarts/endpoint-standart.adoc[Документация эндпоинтов]
+* Архитектура
+** xref:architecture/pipeline.adoc[Пайплайн документации]
