@@ -15,17 +15,19 @@ flowchart LR
         D --> E[npm ci]
         E --> F[Ожидание Kroki<br/>health-check]
         F --> G[Antora сборка сайта]
-        G --> H[Загрузка артефакта<br/>upload-pages-artifact]
+        G --> H[Публикация OpenAPI<br/>в build/site/openapi]
+        H --> I[Загрузка артефакта<br/>upload-pages-artifact]
     end
 
-    H --> I[Деплой]
+    I --> J[Деплой]
 
     subgraph deploy[Деплой]
-        I --> J[deploy-pages]
-        J --> K[GitHub Pages]
+        J --> K[deploy-pages]
+        K --> L[GitHub Pages]
     end
 
-    K --> L[Пользователи видят документацию]
+    L --> M[Документация доступна пользователям]
+    L --> N[OpenAPI спецификация<br/>/openapi/openapi.yaml]
 
     subgraph Services[Сервис-контейнеры Docker]
         S1[Kroki:8000]
@@ -36,10 +38,12 @@ flowchart LR
     F -.- S1
 
     %% Failure paths
-    E -.->|Ошибка| M[Build failed]
-    F -.->|Ошибка| M
-    G -.->|Ошибка| M
-    J -.->|Ошибка| N[Deploy failed]
-    M --> O[Уведомление разработчика]
-    N --> O
+    E -.->|Ошибка| X[Build failed]
+    F -.->|Ошибка| X
+    G -.->|Ошибка| X
+    H -.->|Ошибка| X
+    K -.->|Ошибка| Y[Deploy failed]
+
+    X --> Z[Уведомление разработчика]
+    Y --> Z
 ....

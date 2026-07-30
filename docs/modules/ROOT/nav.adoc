@@ -4,6 +4,7 @@
 ** xref:guides/authentication.adoc[Аутентификация]
 * API Reference
 ** xref:api/overview.adoc[Обзор API]
+** xref:api/openapi.adoc[OpenAPI (Redoc)]
 ** xref:api/errors.adoc[Ошибки и коды состояния]
 ** Endpoints
 *** xref:api/endpoints/auth.adoc[Auth]
