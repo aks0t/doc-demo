@@ -3,11 +3,17 @@ info:
   title: CRM Leads API
   version: "1.0"
   description: Сгенерированный демонстрационный REST API для управления лидами в учебной XRM-платформе.
+tags:
+  - name: Auth
+    description: Аутентификация
+  - name: Leads
+    description: Управление лидами
 servers:
   - url: https://api.example-crm.dev/v1
 paths:
   /auth/token:
     post:
+      tags: [Auth]
       summary: Получить токен доступа
       security: []
       requestBody:
@@ -22,6 +28,9 @@ paths:
                   type: string
                 clientSecret:
                   type: string
+            example:
+              clientId: "your-client-id"
+              clientSecret: "your-client-secret"
       responses:
         "200":
           description: Токен успешно выдан
@@ -36,8 +45,41 @@ paths:
                     type: string
                   expiresIn:
                     type: integer
+              example:
+                accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                tokenType: "Bearer"
+                expiresIn: 3600
+        "400":
+          description: Невалидный запрос
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                missing_clientId:
+                  value:
+                    error:
+                      code: "validation_error"
+                      message: "Missing clientId"
+                      field: "clientId"
+                invalid_json:
+                  value:
+                    error:
+                      code: "validation_error"
+                      message: "Invalid JSON format"
+        "401":
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "invalid_credentials"
+                  message: "Invalid credentials"
   /leads:
     get:
+      tags: [Leads]
       summary: Список лидов
       parameters:
         - name: status
@@ -73,7 +115,27 @@ paths:
                     type: integer
                   totalItems:
                     type: integer
+              example:
+                items:
+                  - id: "ld_1001"
+                    fullName: "Иван Петров"
+                    email: "ivan.petrov@example.com"
+                    phone: "+79991234567"
+                    source: "website_form"
+                    status: "new"
+                    createdAt: "2026-07-20T10:15:00Z"
+                    updatedAt: "2026-07-20T10:15:00Z"
+                page: 1
+                pageSize: 20
+                totalItems: 1
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "429":
+          $ref: "#/components/responses/RateLimited"
     post:
+      tags: [Leads]
       summary: Создать лид
       requestBody:
         required: true
@@ -81,6 +143,11 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/LeadCreateRequest"
+            example:
+              fullName: "Мария Иванова"
+              email: "maria.ivanova@example.com"
+              phone: "+79997654321"
+              source: "website_form"
       responses:
         "201":
           description: Лид создан
@@ -88,10 +155,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Lead"
+              example:
+                id: "ld_1002"
+                fullName: "Мария Иванова"
+                email: "maria.ivanova@example.com"
+                phone: "+79997654321"
+                source: "website_form"
+                status: "new"
+                createdAt: "2026-07-27T09:00:00Z"
+                updatedAt: "2026-07-27T09:00:00Z"
+        "400":
+          description: Невалидные данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                invalid_email:
+                  value:
+                    error:
+                      code: "validation_error"
+                      message: "Invalid email format"
+                      field: "email"
+                missing_required:
+                  value:
+                    error:
+                      code: "validation_error"
+                      message: "Full name is required"
+                      field: "fullName"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "409":
-          description: Лид с таким email уже существует
+          description: Конфликт (дубликат email)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "duplicate_email"
+                  message: "Email already exists"
+                  field: "email"
+        "429":
+          $ref: "#/components/responses/RateLimited"
   /leads/{id}:
     get:
+      tags: [Leads]
       summary: Получить лид по ID
       parameters:
         - $ref: "#/components/parameters/LeadId"
@@ -102,9 +213,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Lead"
+              example:
+                id: "ld_1001"
+                fullName: "Иван Петров"
+                email: "ivan.petrov@example.com"
+                phone: "+79991234567"
+                source: "website_form"
+                status: "new"
+                createdAt: "2026-07-20T10:15:00Z"
+                updatedAt: "2026-07-20T10:15:00Z"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           description: Лид не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "lead_not_found"
+                  message: "Lead not found"
+                  field: "id"
+        "429":
+          $ref: "#/components/responses/RateLimited"
     patch:
+      tags: [Leads]
       summary: Обновить лид
       parameters:
         - $ref: "#/components/parameters/LeadId"
@@ -114,6 +250,8 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/LeadUpdateRequest"
+            example:
+              status: "qualified"
       responses:
         "200":
           description: Лид обновлён
@@ -121,15 +259,68 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Lead"
+              example:
+                id: "ld_1001"
+                fullName: "Иван Петров"
+                email: "ivan.petrov@example.com"
+                phone: "+79991234567"
+                source: "website_form"
+                status: "qualified"
+                createdAt: "2026-07-20T10:15:00Z"
+                updatedAt: "2026-07-27T09:05:00Z"
+        "400":
+          description: Невалидные данные
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "validation_error"
+                  message: "Invalid status value"
+                  field: "status"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: Лид не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "lead_not_found"
+                  message: "Lead not found"
+                  field: "id"
+        "429":
+          $ref: "#/components/responses/RateLimited"
     delete:
+      tags: [Leads]
       summary: Удалить лид
       parameters:
         - $ref: "#/components/parameters/LeadId"
       responses:
         "204":
           description: Лид удалён
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
         "404":
           description: Лид не найден
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "lead_not_found"
+                  message: "Lead not found"
+                  field: "id"
+        "429":
+          $ref: "#/components/responses/RateLimited"
 components:
   parameters:
     LeadId:
@@ -138,24 +329,32 @@ components:
       required: true
       schema:
         type: string
+      example: "ld_1001"
   schemas:
     Lead:
       type: object
       properties:
         id:
           type: string
+          description: Уникальный идентификатор лида, генерируется сервером (формат ld_XXXX)
         fullName:
           type: string
+          description: Полное имя лида
         email:
           type: string
+          format: email
+          description: Email лида, уникальный в рамках аккаунта
         phone:
           type: string
+          description: Телефон в формате E.164
         source:
           type: string
           enum: [website_form, phone_call, partner, manual]
+          description: Источник лида, по умолчанию manual
         status:
           type: string
           enum: [new, in_progress, qualified, closed]
+          description: Статус обработки лида
         createdAt:
           type: string
           format: date-time
@@ -170,19 +369,80 @@ components:
           type: string
         email:
           type: string
+          format: email
         phone:
           type: string
         source:
           type: string
           enum: [website_form, phone_call, partner, manual]
+          default: manual
     LeadUpdateRequest:
       type: object
+      minProperties: 1
       properties:
         status:
           type: string
           enum: [new, in_progress, qualified, closed]
         phone:
           type: string
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+    Error:
+      type: object
+      description: Детали ошибки
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          description: Машинный код ошибки
+          enum: [validation_error, duplicate_email, lead_not_found, invalid_status_transition, invalid_credentials, unauthorized, rate_limit_exceeded, forbidden]
+        message:
+          type: string
+          description: Человекочитаемое описание
+        field:
+          type: string
+          description: Поле, к которому относится ошибка (если применимо)
+    ErrorResponse:
+      type: object
+      description: Стандартная обёртка ошибки
+      required: [error]
+      properties:
+        error:
+          $ref: "#/components/schemas/Error"
+  responses:
+    Unauthorized:
+      description: Требуется аутентификация
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error:
+              code: "unauthorized"
+              message: "Valid access token required"
+    Forbidden:
+      description: Доступ запрещён
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error:
+              code: "forbidden"
+              message: "Insufficient permissions"
+    RateLimited:
+      description: Превышен лимит запросов
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error:
+              code: "rate_limit_exceeded"
+              message: "Too many requests"
   securitySchemes:
     bearerAuth:
       type: http
