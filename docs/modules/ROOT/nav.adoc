@@ -14,5 +14,6 @@
 ** xref:bpmn/lead-handling.adoc[Обработка лида]
 * Стандарты
 ** xref:standarts/endpoint-standart.adoc[Документация эндпоинтов]
+** xref:standarts/discovery-template.adoc[Шаблон discovery]
 * Архитектура
 ** xref:architecture/pipeline.adoc[Пайплайн документации]
