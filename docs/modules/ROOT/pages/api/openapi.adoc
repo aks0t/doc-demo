@@ -5,7 +5,7 @@
 ++++
 <iframe
   id="redoc-frame"
-  style="width:100vh; height:65vh; border:0; border-radius:8px;"
+  style="width:70vw; height:65vh; border:0; border-radius:8px;"
   loading="lazy"
   title="OpenAPI reference (Redoc)">
 </iframe>

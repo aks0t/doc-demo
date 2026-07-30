@@ -17,5 +17,6 @@
 ** xref:standarts/endpoint-standart.adoc[Документация эндпоинтов]
 ** xref:standarts/discovery-template.adoc[Шаблон discovery]
 ** xref:standarts/sdlc-documentation.adoc[Жизненный цикл разр. ПО и доки]
+* xref:glossary.adoc[Глоссарий]
 * Архитектура
 ** xref:architecture/pipeline.adoc[Пайплайн документации]
