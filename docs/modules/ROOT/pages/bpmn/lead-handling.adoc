@@ -1,0 +1,358 @@
+= Процесс обработки лида
+
+Бизнес-процесс от получения лида до закрытия сделки.
+
+== Роли и ответственность
+
+[cols="1,3,2,2"]
+|===
+| Роль | Ответственность | Вход | Выход / SLA
+
+| *Маркетинг*
+| Первичная обработка лида: перевод в работу, квалификация по критериям (бюджет, потребность, ЛПР).
+| Лид в статусе `new`.
+| Лид либо закрыт как проигрыш, либо передан в продажи со статусом `qualified`. SLA на квалификацию — 4 рабочих часа с момента поступления.
+
+| *Отдел продаж*
+| Контакт с квалифицированным лидом, формирование и защита коммерческого предложения.
+| Лид в статусе `qualified`.
+| Сделка закрыта (успех/проигрыш). SLA на первый контакт — 1 рабочий день после получения от маркетинга.
+
+| *CRM-система*
+| Автоматическое создание записи лида, хранение и валидация статусов, фиксация финального результата. Не принимает решений — только исполняет и валидирует переходы.
+| Событие «Лид получен» / решение маркетинга или продаж.
+| Актуальная запись лида с корректным статусом. Отклоняет невалидные переходы и дубли email (`409 duplicate_email`).
+|===
+
+*Логика:*
+. Лид поступает (событие «Лид получен»).
+. CRM создаёт лида (статус `new`).
+. Маркетинг переводит лид в обработку (статус `in_progress`).
+. Маркетинг квалифицирует лида.
+. Если лид не квалифицирован → закрытие как проигрыш силами маркетинга (`in_progress` → `closed`).
+. Если квалифицирован → статус меняется на `qualified`, отдел продаж связывается и формирует предложение.
+. Если предложение принято → успешное закрытие (`qualified` → `closed`).
+. Если предложение отклонено → лид возвращается в обработку (`qualified` → `in_progress`), после чего закрывается как проигрыш отделом продаж (`in_progress` → `closed`).
+
+NOTE: Переходы статусов соответствуют диаграмме состояний ресурса `leads` — прямого перехода
+`qualified → closed` с причиной «отклонено» в модели данных нет, поэтому отклонённое предложение
+сначала возвращает лид в `in_progress`.
+
+== BPMN-диаграмма
+
+[bpmn]
+....
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+    xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+    xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+    xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    id="Definitions_1"
+    targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <process id="Process_lead_handling" isExecutable="false">
+
+    <laneSet id="LaneSet_1">
+
+      <lane id="Lane_marketing" name="Маркетинг">
+        <flowNodeRef>StartEvent_1</flowNodeRef>
+        <flowNodeRef>Task_start_processing</flowNodeRef>
+        <flowNodeRef>Task_qualify_lead</flowNodeRef>
+        <flowNodeRef>Gateway_qualified</flowNodeRef>
+        <flowNodeRef>Task_update_qualified</flowNodeRef>
+      </lane>
+
+      <lane id="Lane_sales" name="Отдел продаж">
+        <flowNodeRef>Task_contact_lead</flowNodeRef>
+        <flowNodeRef>Task_make_offer</flowNodeRef>
+        <flowNodeRef>Gateway_offer_accepted</flowNodeRef>
+        <flowNodeRef>Task_close_won</flowNodeRef>
+        <flowNodeRef>Task_return_to_processing</flowNodeRef>
+        <flowNodeRef>Task_close_lost_sales</flowNodeRef>
+      </lane>
+
+      <lane id="Lane_crm" name="CRM-система">
+        <flowNodeRef>Task_create_lead</flowNodeRef>
+        <flowNodeRef>BoundaryEvent_duplicate_email</flowNodeRef>
+        <flowNodeRef>EndEvent_error</flowNodeRef>
+        <flowNodeRef>Task_close_lost_marketing</flowNodeRef>
+        <flowNodeRef>EndEvent_1</flowNodeRef>
+      </lane>
+
+    </laneSet>
+
+
+    <!-- Элементы процесса -->
+
+    <startEvent id="StartEvent_1" name="Лид получен">
+      <outgoing>Flow_1</outgoing>
+    </startEvent>
+
+    <task id="Task_create_lead" name="Создать лид&#10;(new)">
+      <incoming>Flow_1</incoming>
+      <outgoing>Flow_2</outgoing>
+    </task>
+
+    <task id="Task_start_processing" name="Начать обработку&#10;(in_progress)">
+      <incoming>Flow_2</incoming>
+      <outgoing>Flow_3</outgoing>
+    </task>
+
+    <task id="Task_qualify_lead" name="Квалифицировать">
+      <incoming>Flow_3</incoming>
+      <outgoing>Flow_4</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_qualified" name="Квалифи-цирован?">
+      <incoming>Flow_4</incoming>
+      <outgoing>Flow_yes</outgoing>
+      <outgoing>Flow_no</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_close_lost_marketing" name="Закрыть: проигран&#10;(in_progress → closed)">
+      <incoming>Flow_no</incoming>
+      <outgoing>Flow_end_1</outgoing>
+    </task>
+
+    <task id="Task_update_qualified" name="Отметить квалифи-цированным&#10;(qualified)">
+      <incoming>Flow_yes</incoming>
+      <outgoing>Flow_5</outgoing>
+    </task>
+
+    <task id="Task_contact_lead" name="Связаться">
+      <incoming>Flow_5</incoming>
+      <outgoing>Flow_6</outgoing>
+    </task>
+
+    <task id="Task_make_offer" name="Предложе-ние">
+      <incoming>Flow_6</incoming>
+      <outgoing>Flow_7</outgoing>
+    </task>
+
+    <exclusiveGateway id="Gateway_offer_accepted" name="Принято?">
+      <incoming>Flow_7</incoming>
+      <outgoing>Flow_offer_yes</outgoing>
+      <outgoing>Flow_offer_no</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_close_won" name="Закрыть: успешно&#10;(qualified → closed)">
+      <incoming>Flow_offer_yes</incoming>
+      <outgoing>Flow_end_2</outgoing>
+    </task>
+
+    <task id="Task_return_to_processing" name="Вернуть в обработку&#10;(qualified → in_progress)">
+      <incoming>Flow_offer_no</incoming>
+      <outgoing>Flow_8</outgoing>
+    </task>
+
+    <task id="Task_close_lost_sales" name="Закрыть: проигран&#10;(in_progress → closed)">
+      <incoming>Flow_8</incoming>
+      <outgoing>Flow_end_3</outgoing>
+    </task>
+
+    <endEvent id="EndEvent_1" name="Обработан">
+      <incoming>Flow_end_1</incoming>
+      <incoming>Flow_end_2</incoming>
+      <incoming>Flow_end_3</incoming>
+    </endEvent>
+
+
+    <!-- Связи (Sequence Flow) -->
+
+    <sequenceFlow id="Flow_1" sourceRef="StartEvent_1" targetRef="Task_create_lead"/>
+    <sequenceFlow id="Flow_2" sourceRef="Task_create_lead" targetRef="Task_start_processing"/>
+    <sequenceFlow id="Flow_3" sourceRef="Task_start_processing" targetRef="Task_qualify_lead"/>
+    <sequenceFlow id="Flow_4" sourceRef="Task_qualify_lead" targetRef="Gateway_qualified"/>
+
+    <sequenceFlow id="Flow_yes" sourceRef="Gateway_qualified" targetRef="Task_update_qualified" name="Да"/>
+    <sequenceFlow id="Flow_no" sourceRef="Gateway_qualified" targetRef="Task_close_lost_marketing" name="Нет"/>
+
+    <sequenceFlow id="Flow_5" sourceRef="Task_update_qualified" targetRef="Task_contact_lead"/>
+    <sequenceFlow id="Flow_6" sourceRef="Task_contact_lead" targetRef="Task_make_offer"/>
+    <sequenceFlow id="Flow_7" sourceRef="Task_make_offer" targetRef="Gateway_offer_accepted"/>
+
+    <sequenceFlow id="Flow_offer_yes" sourceRef="Gateway_offer_accepted" targetRef="Task_close_won" name="Да"/>
+    <sequenceFlow id="Flow_offer_no" sourceRef="Gateway_offer_accepted" targetRef="Task_return_to_processing" name="Нет"/>
+
+    <sequenceFlow id="Flow_8" sourceRef="Task_return_to_processing" targetRef="Task_close_lost_sales"/>
+
+    <sequenceFlow id="Flow_end_1" sourceRef="Task_close_lost_marketing" targetRef="EndEvent_1"/>
+    <sequenceFlow id="Flow_end_2" sourceRef="Task_close_won" targetRef="EndEvent_1"/>
+    <sequenceFlow id="Flow_end_3" sourceRef="Task_close_lost_sales" targetRef="EndEvent_1"/>
+
+  </process>
+
+
+  <!-- Графическое представление -->
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_lead_handling">
+
+      <!-- Узлы: дорожка «Маркетинг» -->
+
+      <bpmndi:BPMNShape id="StartEvent_1_di" bpmnElement="StartEvent_1">
+        <dc:Bounds x="100" y="170" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_start_processing_di" bpmnElement="Task_start_processing">
+        <dc:Bounds x="380" y="140" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_qualify_lead_di" bpmnElement="Task_qualify_lead">
+        <dc:Bounds x="560" y="140" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_qualified_di" bpmnElement="Gateway_qualified" isMarkerVisible="true">
+        <dc:Bounds x="740" y="155" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_update_qualified_di" bpmnElement="Task_update_qualified">
+        <dc:Bounds x="860" y="140" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Узлы: дорожка «Отдел продаж» -->
+
+      <bpmndi:BPMNShape id="Task_contact_lead_di" bpmnElement="Task_contact_lead">
+        <dc:Bounds x="1040" y="340" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_make_offer_di" bpmnElement="Task_make_offer">
+        <dc:Bounds x="1220" y="340" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Gateway_offer_accepted_di" bpmnElement="Gateway_offer_accepted">
+        <dc:Bounds x="1400" y="355" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_close_won_di" bpmnElement="Task_close_won">
+        <dc:Bounds x="1520" y="280" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_return_to_processing_di" bpmnElement="Task_return_to_processing">
+        <dc:Bounds x="1520" y="440" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_close_lost_sales_di" bpmnElement="Task_close_lost_sales">
+        <dc:Bounds x="1700" y="440" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Узлы: дорожка «CRM-система» -->
+
+      <bpmndi:BPMNShape id="Task_create_lead_di" bpmnElement="Task_create_lead">
+        <dc:Bounds x="200" y="620" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="Task_close_lost_marketing_di" bpmnElement="Task_close_lost_marketing">
+        <dc:Bounds x="740" y="620" width="120" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="EndEvent_1_di" bpmnElement="EndEvent_1">
+        <dc:Bounds x="1920" y="642" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+
+      <!-- Стрелки (Edges) -->
+
+      <bpmndi:BPMNEdge id="Flow_1_di" bpmnElement="Flow_1">
+        <di:waypoint x="118" y="206"/>
+        <di:waypoint x="118" y="660"/>
+        <di:waypoint x="200" y="660"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_2_di" bpmnElement="Flow_2">
+        <di:waypoint x="320" y="660"/>
+        <di:waypoint x="440" y="660"/>
+        <di:waypoint x="440" y="220"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_3_di" bpmnElement="Flow_3">
+        <di:waypoint x="500" y="180"/>
+        <di:waypoint x="560" y="180"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_4_di" bpmnElement="Flow_4">
+        <di:waypoint x="680" y="180"/>
+        <di:waypoint x="740" y="180"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_yes_di" bpmnElement="Flow_yes">
+        <di:waypoint x="790" y="180"/>
+        <di:waypoint x="860" y="180"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="810" y="160" width="30" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_no_di" bpmnElement="Flow_no">
+        <di:waypoint x="765" y="205"/>
+        <di:waypoint x="765" y="620"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="775" y="400" width="30" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_5_di" bpmnElement="Flow_5">
+        <di:waypoint x="920" y="220"/>
+        <di:waypoint x="920" y="380"/>
+        <di:waypoint x="1040" y="380"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_6_di" bpmnElement="Flow_6">
+        <di:waypoint x="1160" y="380"/>
+        <di:waypoint x="1220" y="380"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_7_di" bpmnElement="Flow_7">
+        <di:waypoint x="1340" y="380"/>
+        <di:waypoint x="1400" y="380"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_offer_yes_di" bpmnElement="Flow_offer_yes">
+        <di:waypoint x="1440" y="365"/>
+        <di:waypoint x="1520" y="320"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1460" y="330" width="30" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_offer_no_di" bpmnElement="Flow_offer_no">
+        <di:waypoint x="1440" y="395"/>
+        <di:waypoint x="1520" y="480"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1460" y="430" width="30" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_8_di" bpmnElement="Flow_8">
+        <di:waypoint x="1640" y="480"/>
+        <di:waypoint x="1700" y="480"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_end_1_di" bpmnElement="Flow_end_1">
+        <di:waypoint x="860" y="660"/>
+        <di:waypoint x="1938" y="660"/>
+        <di:waypoint x="1938" y="678"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_end_2_di" bpmnElement="Flow_end_2">
+        <di:waypoint x="1640" y="320"/>
+        <di:waypoint x="1938" y="320"/>
+        <di:waypoint x="1938" y="642"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="Flow_end_3_di" bpmnElement="Flow_end_3">
+        <di:waypoint x="1820" y="480"/>
+        <di:waypoint x="1938" y="480"/>
+        <di:waypoint x="1938" y="642"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+
+  </bpmndi:BPMNDiagram>
+
+</definitions>
+....  

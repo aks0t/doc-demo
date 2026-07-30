@@ -10,6 +10,8 @@
 *** xref:api/endpoints/leads.adoc[Leads]
 ** UseCases
 *** xref:api/use-cases/lead-integration.adoc[Интеграция лида]
+* Процессы
+** xref:bpmn/lead-handling.adoc[Обработка лида]
 * Стандарты
 ** xref:standarts/endpoint-standart.adoc[Документация эндпоинтов]
 * Архитектура
