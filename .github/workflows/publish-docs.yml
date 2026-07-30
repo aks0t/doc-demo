@@ -57,6 +57,12 @@ jobs:
 
       - name: Build site
         run: npx antora --stacktrace antora-playbook.yml
+        
+      - name: Publish OpenAPI spec
+        run: |
+          test -f openapi/openapi.yaml
+          mkdir -p build/site/openapi
+          cp openapi/openapi.yaml build/site/openapi/openapi.yaml
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
