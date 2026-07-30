@@ -19,9 +19,12 @@ ui:
 output:
   dir: build/site
 
+# Kroki-сервер поднимается ЛОКАЛЬНО (см. build.sh) и в CI (см. .github/workflows/publish-docs.yml)
+# как сервис-контейнер на localhost:8000 — в обоих случаях используется один и тот же адрес,
+# сборка ни разу не ходит в публичный kroki.io. Это устраняет флаки, вызванный сетью/rate-limit'ами.
 asciidoc:
   extensions:
     - asciidoctor-kroki
   attributes:
-    kroki-server-url: https://kroki.io
+    kroki-server-url: http://localhost:8000
     kroki-fetch-diagram: true

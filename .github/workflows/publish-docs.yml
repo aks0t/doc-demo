@@ -16,6 +16,23 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    # Тот же стек, что и локально в build.sh/docker-compose.yml: Kroki + companion-контейнеры
+    # для Mermaid и BPMN. Сервис-контейнеры внутри одного job'а сидят на общей docker-сети,
+    # поэтому kroki достаёт mermaid/bpmn по имени сервиса, а сам job (раннер) — по localhost:8000.
+    services:
+      kroki:
+        image: yuzutech/kroki
+        ports:
+          - 8000:8000
+        env:
+          KROKI_MERMAID_HOST: mermaid
+          KROKI_BPMN_HOST: bpmn
+      mermaid:
+        image: yuzutech/kroki-mermaid
+      bpmn:
+        image: yuzutech/kroki-bpmn
+
     steps:
       - uses: actions/checkout@v4
 
@@ -26,8 +43,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Wait for Kroki
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null http://localhost:8000/health || curl -s -o /dev/null -w '%{http_code}' http://localhost:8000 | grep -qE '^[0-9]{3}$'; then
+              echo "Kroki is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Kroki did not become ready in time"
+          exit 1
+
       - name: Build site
-        run: npx antora antora-playbook.yml
+        run: npx antora --stacktrace antora-playbook.yml
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

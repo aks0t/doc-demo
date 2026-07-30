@@ -1,0 +1,21 @@
+services:
+  kroki:
+    image: yuzutech/kroki
+    ports:
+      - "8000:8000"
+    environment:
+      - KROKI_MERMAID_HOST=mermaid
+      - KROKI_BPMN_HOST=bpmn
+    depends_on:
+      - mermaid
+      - bpmn
+
+  mermaid:
+    image: yuzutech/kroki-mermaid
+    expose:
+      - "8002"
+
+  bpmn:
+    image: yuzutech/kroki-bpmn
+    expose:
+      - "8003"
