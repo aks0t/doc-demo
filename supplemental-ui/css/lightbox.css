@@ -1,0 +1,93 @@
+/* ==========================================================================
+   Lightbox для диаграмм (SVG, рендерятся через Kroki)
+   Клик по диаграмме — плавное увеличение на весь экран.
+   Клик мимо изображения / кнопка закрытия / Esc — закрытие.
+   ========================================================================== */
+
+.imageblock .content img[src$=".svg"] {
+  cursor: zoom-in;
+  transition: opacity 0.15s ease, filter 0.15s ease;
+  border-radius: 4px;
+}
+
+.imageblock .content img[src$=".svg"]:hover {
+  opacity: 0.92;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.12));
+}
+
+.diagram-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 5vw, 64px);
+  background: rgba(15, 17, 21, 0.86);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0s linear 0.22s;
+}
+
+.diagram-lightbox-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.22s ease, visibility 0s linear 0s;
+}
+
+.diagram-lightbox-overlay img {
+  max-width: 90vw;
+  max-height: 88vh;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  cursor: zoom-out;
+  transform: scale(0.94);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.diagram-lightbox-overlay.is-open img {
+  transform: scale(1);
+}
+
+.diagram-lightbox-close {
+  position: absolute;
+  top: clamp(12px, 3vw, 28px);
+  right: clamp(12px, 3vw, 32px);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.diagram-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.24);
+  transform: scale(1.05);
+}
+
+.diagram-lightbox-hint {
+  position: absolute;
+  bottom: clamp(12px, 3vw, 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .diagram-lightbox-hint {
+    display: none;
+  }
+}
