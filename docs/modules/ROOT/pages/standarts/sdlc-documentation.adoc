@@ -30,7 +30,7 @@ ISO/IEC/IEEE 26511-26515.
 целесообразность.
 | * Business Requirements Document (BRD)
 * Vision & Scope Document
-* User Stories / Use Cases
+* User Stories / UseCase
 * Software Requirements Specification (SRS)
 | Участвует в discovery: интервью со стейкхолдерами, фиксация требований в
 структурированном виде. На этом этапе документация формирует основу для будущего
