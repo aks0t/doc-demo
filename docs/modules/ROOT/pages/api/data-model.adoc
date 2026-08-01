@@ -1,0 +1,63 @@
+= Модель данных: ER-диаграмма
+
+Ресурс `leads` в текущей версии API — единственная сущность. Ниже — её ER-диаграмма
+и то, как она логически расширяется в перспективе (вне рамок текущей версии API).
+
+== Текущая модель
+
+[mermaid]
+....
+erDiagram
+    LEAD {
+        string id PK
+        string fullName
+        string email UK
+        string phone
+        string source
+        string status
+        datetime createdAt
+        datetime updatedAt
+    }
+....
+
+`email` помечен как уникальный (`UK`) — именно на это ограничение ссылается ошибка
+`409 duplicate_email` при `POST /leads` (см. xref:api/errors.adoc[]).
+
+== Перспективное расширение
+
+Реальная CRM обычно не хранит лиды изолированно — они группируются вокруг компании
+(аккаунта) и по мере квалификации превращаются в сделки. В текущей версии API этого
+нет: `deal` не является отдельным ресурсом, факт "сделки" отражается только статусом
+лида (см. xref:glossary.adoc[глоссарий], термин "Deal"). Ниже — как выглядела бы
+модель, если бы это расширение было реализовано:
+
+[mermaid]
+....
+erDiagram
+    ACCOUNT ||--o{ LEAD : "владеет"
+    LEAD ||--o| DEAL : "порождает (после qualified)"
+
+    ACCOUNT {
+        string id PK
+        string companyName
+        string industry
+    }
+
+    LEAD {
+        string id PK
+        string accountId FK
+        string fullName
+        string email UK
+        string status
+    }
+
+    DEAL {
+        string id PK
+        string leadId FK
+        decimal amount
+        string stage
+    }
+....
+
+Это намеренно вынесено в отдельный раздел, а не смешано с текущей моделью — чтобы
+не создавать впечатление, что `ACCOUNT`/`DEAL` уже существуют как ресурсы API.

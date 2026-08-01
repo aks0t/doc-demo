@@ -6,6 +6,7 @@
 ** xref:api/overview.adoc[Обзор API]
 ** xref:api/openapi.adoc[OpenAPI (Redoc)]
 ** xref:api/errors.adoc[Ошибки и коды состояния]
+** xref:api/data-model.adoc[Модель данных (ER)]
 ** Endpoints
 *** xref:api/endpoints/auth.adoc[Auth]
 *** xref:api/endpoints/leads.adoc[Leads]
@@ -17,6 +18,8 @@
 ** xref:standarts/endpoint-standart.adoc[Документация эндпоинтов]
 ** xref:standarts/discovery-template.adoc[Шаблон discovery]
 ** xref:standarts/sdlc-documentation.adoc[Жизненный цикл разр. ПО и доки]
+** xref:standarts/documentation-workflow.adoc[Процесс документирования (Activity)]
+** xref:standarts/api-protocols-comparison.adoc[REST vs SOAP vs GraphQL]
 * xref:glossary.adoc[Глоссарий]
 * Архитектура
 ** xref:architecture/pipeline.adoc[Пайплайн документации]
