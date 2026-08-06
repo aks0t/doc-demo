@@ -178,6 +178,10 @@ curl -X POST "https://api.example-crm.dev/v1/leads" \
 | Невалидные данные.
 | `{"error": {"code": "validation_error", "message": "Invalid email format", "field": "email"}}`
 
+| `400 Bad Request`
+| Передано недопустимое значение `source`. Допустимые значения: `website_form`, `phone_call`, `partner`, `manual`.
+| `{"error": {"code": "validation_error", "message": "Invalid source value", "field": "source"}}`
+
 | `409 Conflict`
 | Лид с таким `email` уже существует.
 | `{"error": {"code": "duplicate_email", "message": "Email already exists", "field": "email"}}`
@@ -298,6 +302,10 @@ curl -X PATCH "https://api.example-crm.dev/v1/leads/ld_1001" \
 | `404 Not Found`
 | Лид с указанным `id` не найден.
 | `{"error": {"code": "lead_not_found", "message": "Lead not found", "field": "id"}}`
+
+| `409 Conflict`
+| Недопустимый переход между статусами. Подробнее см. xref:api/endpoints/leads.adoc#_диаграмма_статусов[диаграмму статусов].
+| `{"error": {"code": "invalid_status_transition", "message": "Invalid status transition from qualified to new", "field": "status"}}`
 |===
 
 == `DELETE /leads/\{id\}`
