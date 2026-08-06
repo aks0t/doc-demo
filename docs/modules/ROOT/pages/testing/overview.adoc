@@ -74,7 +74,7 @@ xref:testing/checklists.adoc#_cross_browser_адаптив_чеклист[Чек
 | Форма создания лида
 | TC-FORM-01…11
 
-| `PATCH /leads/{id}` (статус)
+| `PATCH /leads/\{id\}` (статус)
 | Смена статуса в карточке
 | TC-STATUS-01…06
 |===

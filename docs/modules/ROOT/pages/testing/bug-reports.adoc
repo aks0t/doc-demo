@@ -58,7 +58,7 @@
 3. Нажать «Сохранить»
 | Ожидаемый результат | Под элементом выбора статуса: «Недопустимый переход статуса»; поле подсвечено
 | Фактический результат | Показывается общий баннер без указания поля; пользователь не понимает, что именно не так
-| Ссылка на контракт | xref:api/errors.adoc#_коды_ошибок_бизнес_логики[] — код `invalid_status_transition`; `PATCH /leads/{id}` → `409` в xref:api/endpoints/leads.adoc#_patch_leads_id[]
+| Ссылка на контракт | xref:api/errors.adoc#_коды_ошибок_бизнес_логики[] — код `invalid_status_transition`; `PATCH /leads/\{id\}` → `409` в xref:api/endpoints/leads.adoc#_patch_leads_id[]
 | Скриншот | (приложить)
 | Статус | Open
 |===
