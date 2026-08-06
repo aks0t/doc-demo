@@ -14,8 +14,20 @@
 *** xref:api/use-cases/lead-integration.adoc[Интеграция лида]
 * Процессы
 ** xref:bpmn/lead-handling.adoc[Обработка лида]
+* Тестирование
+** xref:testing/overview.adoc[Обзор: подход к тестированию]
+** xref:testing/test-plan.adoc[Test Plan]
+** Тест-кейсы
+*** xref:testing/test-cases/auth.adoc[Логин и аутентификация]
+*** xref:testing/test-cases/leads-list.adoc[Список лидов]
+*** xref:testing/test-cases/lead-form.adoc[Создание / редактирование лида]
+*** xref:testing/test-cases/lead-status.adoc[Смена статуса лида]
+** xref:testing/bug-reports.adoc[Баг-репорты (примеры)]
+** xref:testing/checklists.adoc[Чек-листы (regression / cross-browser)]
+** xref:testing/test-report.adoc[Итоговый отчёт по прогону]
 * Стандарты
 ** xref:standarts/endpoint-standart.adoc[Документация эндпоинтов]
+** xref:standarts/test-case-standart.adoc[Оформление тест-кейсов]
 ** xref:standarts/discovery-template.adoc[Шаблон discovery]
 ** xref:standarts/sdlc-documentation.adoc[Жизненный цикл разр. ПО и доки]
 ** xref:standarts/documentation-workflow.adoc[Процесс документирования (Activity)]
