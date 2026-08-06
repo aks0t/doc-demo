@@ -294,6 +294,17 @@ paths:
                   code: "lead_not_found"
                   message: "Lead not found"
                   field: "id"
+        "409":
+          description: Конфликт (недопустимый переход статуса)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: "invalid_status_transition"
+                  message: "Invalid status transition from qualified to new"
+                  field: "status"
         "429":
           $ref: "#/components/responses/RateLimited"
     delete:
@@ -390,6 +401,10 @@ components:
         email:
           type: string
           format: email
+        source:
+          type: string
+          enum: [website_form, phone_call, partner, manual]
+          description: Источник лида
     Error:
       type: object
       description: Детали ошибки
