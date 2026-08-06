@@ -1,0 +1,215 @@
+{
+  "info": {
+    "name": "CRM Leads API — smoke tests",
+    "description": "Smoke-набор ключевых сценариев контракта: токен, создание лида, дубликат email (409), несуществующий id (404), недопустимый переход статуса (409), список с фильтром. Соответствует openapi/openapi.yaml v1.0.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get token — 200 OK, accessToken присутствует",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response has accessToken, tokenType, expiresIn', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.accessToken).to.be.a('string').and.to.not.be.empty;",
+              "  pm.expect(body.tokenType).to.eql('Bearer');",
+              "  pm.expect(body.expiresIn).to.eql(3600);",
+              "});",
+              "pm.environment.set('token', pm.response.json().accessToken);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{baseUrl}}/auth/token",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"clientId\": \"your-client-id\",\n  \"clientSecret\": \"your-client-secret\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Create lead — 201 Created, статус new",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+              "pm.test('Created lead has id and status new', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.id).to.match(/^ld_/);",
+              "  pm.expect(body.status).to.eql('new');",
+              "  pm.expect(body.email).to.eql(pm.variables.get('newLeadEmail'));",
+              "});",
+              "pm.environment.set('createdLeadId', pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/leads",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Smoke Test Lead\",\n  \"email\": \"{{newLeadEmail}}\",\n  \"source\": \"manual\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Duplicate email — 409 duplicate_email",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 409', function () { pm.response.to.have.status(409); });",
+              "pm.test('Error code is duplicate_email with field email', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.error.code).to.eql('duplicate_email');",
+              "  pm.expect(body.error.field).to.eql('email');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/leads",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Duplicate Email Lead\",\n  \"email\": \"{{newLeadEmail}}\",\n  \"source\": \"manual\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Get non-existent lead — 404 lead_not_found",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 404', function () { pm.response.to.have.status(404); });",
+              "pm.test('Error code is lead_not_found with field id', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.error.code).to.eql('lead_not_found');",
+              "  pm.expect(body.error.field).to.eql('id');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/leads/ld_nonexistent"
+      }
+    },
+    {
+      "name": "Invalid status transition — 409 invalid_status_transition",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 409', function () { pm.response.to.have.status(409); });",
+              "pm.test('Error code is invalid_status_transition with field status', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.error.code).to.eql('invalid_status_transition');",
+              "  pm.expect(body.error.field).to.eql('status');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/leads/{{createdLeadId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"qualified\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Valid transition — 200 OK, статус in_progress",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Status changed to in_progress', function () {",
+              "  pm.expect(pm.response.json().status).to.eql('in_progress');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": "{{baseUrl}}/leads/{{createdLeadId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"in_progress\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Filtered list — 200 OK, items содержат только new",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+              "pm.test('Response has items, page, pageSize, totalItems', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.items).to.be.an('array');",
+              "  pm.expect(body.page).to.eql(1);",
+              "  pm.expect(body.pageSize).to.eql(20);",
+              "  pm.expect(body.totalItems).to.be.a('number');",
+              "});",
+              "pm.test('All items have status new', function () {",
+              "  pm.response.json().items.forEach(function (item) { pm.expect(item.status).to.eql('new'); });",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/leads?status=new&page=1&pageSize=20"
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "https://api.example-crm.dev/v1" },
+    { "key": "newLeadEmail", "value": "smoke-lead@example.com" },
+    { "key": "token", "value": "" },
+    { "key": "createdLeadId", "value": "" }
+  ]
+}
