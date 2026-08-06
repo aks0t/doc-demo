@@ -2,7 +2,7 @@
 
 Тест-кейсы на форму создания и редактирования лида в Admin UI. Форма отправляет
 `POST /leads` (создание) и `PATCH /leads/{id}` (редактирование) — см.
-xref:api/endpoints/leads.adoc[Leads API].
+xref:api/endpoints/leads.adoc#_post_leads[Leads API].
 
 == Таблица кейсов
 
@@ -98,10 +98,10 @@ xref:api/endpoints/leads.adoc[Leads API].
 
 == Связь с API
 
-* Обязательные поля и форматы — xref:api/endpoints/leads.adoc[Leads API],
+* Обязательные поля и форматы — xref:api/endpoints/leads.adoc#_модель_данных[Leads API],
   раздел «Модель данных» (`fullName`, `email` — обязательные; `phone` — E.164;
   `source` — из перечисления).
-* `409 duplicate_email` — xref:api/errors.adoc[Ошибки и коды состояния]
+* `409 duplicate_email` — xref:api/errors.adoc#_коды_ошибок_бизнес_логики[Ошибки и коды состояния]
   (TC-FORM-07).
 * `validation_error` с указанием поля — TC-FORM-03…06, TC-FORM-08.
 

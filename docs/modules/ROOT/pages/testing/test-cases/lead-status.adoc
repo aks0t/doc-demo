@@ -2,7 +2,7 @@
 
 Тест-кейсы на смену статуса лида в карточке Admin UI. Действие отправляет
 `PATCH /leads/{id}` с полем `status`. Разрешённые переходы заданы диаграммой
-статусов в xref:api/endpoints/leads.adoc[Leads API]:
+статусов в xref:api/endpoints/leads.adoc#_диаграмма_статусов[Leads API]:
 
 [source,mermaid]
 ....
@@ -76,9 +76,9 @@ stateDiagram-v2
 == Примечания
 
 * Полный список допустимых переходов — диаграмма статусов в
-  xref:api/endpoints/leads.adoc[Leads API].
+  xref:api/endpoints/leads.adoc#_диаграмма_статусов[Leads API].
 * Ошибка `invalid_status_transition` документирована в
-  xref:api/errors.adoc[Ошибки и коды состояния] и в ответе `409 Conflict`
-  операции `PATCH /leads/{id}`.
+  xref:api/errors.adoc#_коды_ошибок_бизнес_логики[Ошибки и коды состояния] и в
+  ответе `409 Conflict` операции xref:api/endpoints/leads.adoc#_patch_leads_id[`PATCH /leads/\{id\}`].
 * Кейсы TC-STATUS-05 и TC-STATUS-06 проверяют, что UI корректно отображает
   ошибку контракта, а не абстрактное «что-то пошло не так».

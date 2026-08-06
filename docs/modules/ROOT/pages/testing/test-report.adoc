@@ -12,7 +12,7 @@
 | Дата | 2026-08-05
 | Версия | CRM Leads API 1.0, Admin UI build 1.2.0
 | Окружение | Chrome 126, Windows 11 / staging
-| Тип прогона | Regression (см. xref:testing/test-plan.adoc[Test Plan])
+| Тип прогона | Regression (см. xref:testing/test-plan.adoc#_стратегия_тестирования[Test Plan])
 |===
 
 == Результаты
@@ -36,8 +36,8 @@
 
 |===
 | ID | Заголовок | Приоритет | Severity | Статус
-| xref:testing/bug-reports.adoc[BR-001] | Ошибка 409 duplicate_email отображается как «Something went wrong» | Medium | Major | Open
-| xref:testing/bug-reports.adoc[BR-002] | Ошибка 409 invalid_status_transition показывается общим баннером | High | Major | Open
+| xref:testing/bug-reports.adoc#BR-001[BR-001] | Ошибка 409 duplicate_email отображается как «Something went wrong» | Medium | Major | Open
+| xref:testing/bug-reports.adoc#BR-002[BR-002] | Ошибка 409 invalid_status_transition показывается общим баннером | High | Major | Open
 |===
 
 Оба дефекта относятся к отображению ошибок API в UI и не блокируют основные

@@ -2,7 +2,7 @@
 
 Тест-кейсы на экран списка лидов Admin UI. Экран отображает данные из
 `GET /leads` и поддерживает фильтр по статусу (`status`) и пагинацию
-(`page`/`pageSize`) — см. xref:api/endpoints/leads.adoc[Leads API].
+(`page`/`pageSize`) — см. xref:api/endpoints/leads.adoc#_get_leads[Leads API].
 
 == Таблица кейсов
 
@@ -72,5 +72,5 @@
 == Примечания
 
 Запрос `GET /leads` с фильтром и пагинацией описан в
-xref:api/endpoints/leads.adoc[Leads API], пример ответа — `200 OK` с полями
-`items`, `page`, `pageSize`, `totalItems`.
+xref:api/endpoints/leads.adoc#_get_leads[Leads API], пример ответа — `200 OK`
+с полями `items`, `page`, `pageSize`, `totalItems`.

@@ -1,7 +1,7 @@
 = Логин и аутентификация
 
 Тест-кейсы на форму логина Admin UI. Форма отправляет `POST /auth/token` с
-полями `clientId` и `clientSecret` (см. xref:api/endpoints/auth.adoc[Auth API]).
+полями `clientId` и `clientSecret` (см. xref:api/endpoints/auth.adoc#_post_auth_token[Auth API]).
 
 == Таблица кейсов
 
@@ -54,10 +54,10 @@
 Каждый негативный кейс проверяет не только сообщение на экране, но и то, что
 интерфейс обрабатывает **именно тот код ошибки**, который возвращает API:
 
-* `401 invalid_credentials` — xref:api/errors.adoc[Ошибки и коды состояния] →
+* `401 invalid_credentials` — xref:api/errors.adoc#_коды_ошибок_бизнес_логики[Ошибки и коды состояния] →
   TC-AUTH-02;
-* `validation_error` (обязательные поля) — xref:api/endpoints/auth.adoc[Auth API] →
+* `validation_error` (обязательные поля) — xref:api/endpoints/auth.adoc#_возможные_ошибки[Auth API] →
   TC-AUTH-03, TC-AUTH-04;
 * `401 unauthorized` (истёкший токен) → TC-AUTH-05.
 
-Детали по срокам жизни токена — в xref:guides/authentication.adoc[Аутентификация].
+Детали по срокам жизни токена — в xref:guides/authentication.adoc#_получение_токена[Аутентификация].

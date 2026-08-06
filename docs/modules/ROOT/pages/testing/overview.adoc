@@ -29,10 +29,10 @@ UI как отдельный код в этом репозитории не ре
 
 | Функциональное (UI)
 | Поведение экранов: валидация форм, отображение ошибок, переходы статусов,
-состояния кнопок и полей. Основа — тест-кейсы в xref:testing/test-cases/auth.adoc[Логин],
-xref:testing/test-cases/leads-list.adoc[Список лидов],
-xref:testing/test-cases/lead-form.adoc[Форма лида],
-xref:testing/test-cases/lead-status.adoc[Смена статуса].
+состояния кнопок и полей. Основа — тест-кейсы в xref:testing/test-cases/auth.adoc#_таблица_кейсов[Логин],
+xref:testing/test-cases/leads-list.adoc#_таблица_кейсов[Список лидов],
+xref:testing/test-cases/lead-form.adoc#_таблица_кейсов[Форма лида],
+xref:testing/test-cases/lead-status.adoc#_таблица_кейсов[Смена статуса].
 
 | API-smoke (Postman)
 | Ключевые сценарии на уровне контракта: получение токена, создание лида,
@@ -41,7 +41,7 @@ xref:testing/test-cases/lead-status.adoc[Смена статуса].
 
 | Нефункциональное (по минимуму)
 | Кросс-браузерность и адаптивность — чек-лист в
-xref:testing/checklists.adoc[Чек-листы].
+xref:testing/checklists.adoc#_cross_browser_адаптив_чеклист[Чек-листы].
 |===
 
 == Инструменты
@@ -51,7 +51,7 @@ xref:testing/checklists.adoc[Чек-листы].
 * Postman — API-smoke-тесты по коллекции
   `qa/api-tests/crm-leads-smoke.postman_collection.json`.
 * Таск-трекер — учёт багов (в этом репозитории условно; примеры оформления —
-  xref:testing/bug-reports.adoc[Баг-репорты]).
+  xref:testing/bug-reports.adoc#BR-001[Баг-репорты]).
 
 == Матрица трассируемости
 
@@ -80,5 +80,5 @@ xref:testing/checklists.adoc[Чек-листы].
 |===
 
 Такой же подход к связыванию сущностей уже используется в
-xref:api/data-model.adoc[модели данных API] — тестовая документация строится по
-тем же принципам.
+xref:api/data-model.adoc#_текущая_модель[модели данных API] — тестовая
+документация строится по тем же принципам.

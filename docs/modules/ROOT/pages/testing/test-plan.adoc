@@ -27,21 +27,21 @@ CRM Leads API. Структура близка к IEEE 829 / ISTQB, но ада�
 
 == Объект и версии
 
-* Объект: Admin UI поверх CRM Leads API (см. xref:testing/overview.adoc[Обзор]).
-* Версия API: `1.0` (см. xref:api/overview.adoc[Обзор API] и `CHANGELOG.md`).
+* Объект: Admin UI поверх CRM Leads API (см. xref:testing/overview.adoc#_объект_тестирования[Обзор]).
+* Версия API: `1.0` (см. xref:api/overview.adoc#_общие_сведения[Обзор API] и `CHANGELOG.md`).
 
 == Стратегия тестирования
 
 [cols="1,2,2"]
 |===
 | Вид | Применяется | На чём
-| Функциональное | Да | Тест-кейсы xref:testing/test-cases/auth.adoc[Auth],
-xref:testing/test-cases/leads-list.adoc[List],
-xref:testing/test-cases/lead-form.adoc[Form],
-xref:testing/test-cases/lead-status.adoc[Status]
+| Функциональное | Да | Тест-кейсы xref:testing/test-cases/auth.adoc#_таблица_кейсов[Auth],
+xref:testing/test-cases/leads-list.adoc#_таблица_кейсов[List],
+xref:testing/test-cases/lead-form.adoc#_таблица_кейсов[Form],
+xref:testing/test-cases/lead-status.adoc#_таблица_кейсов[Status]
 | API-smoke | Да | Postman-коллекция
-| Regression | Да | Чек-лист xref:testing/checklists.adoc[Checklists]
-| Кросс-браузер | Да | Чек-лист xref:testing/checklists.adoc[Checklists]
+| Regression | Да | Чек-лист xref:testing/checklists.adoc#_regression_чеклист[Checklists]
+| Кросс-браузер | Да | Чек-лист xref:testing/checklists.adoc#_cross_browser_адаптив_чеклист[Checklists]
 | Нагрузочное | Нет | Сознательно исключено (см. границы)
 | Security | Частично | Только поведение 401/403/429
 |===
@@ -58,12 +58,12 @@ xref:testing/test-cases/lead-status.adoc[Status]
 
 * Все тест-кейсы severity High выполнены.
 * Нет открытых критических багов (severity Critical/Blocker).
-* Все найденные дефекты заведены в баг-репорты (xref:testing/bug-reports.adoc[Bug-reports]).
-* Отчёт по прогону сформирован (xref:testing/test-report.adoc[Test report]).
+* Все найденные дефекты заведены в баг-репорты (xref:testing/bug-reports.adoc#_severity_vs_priority[Bug-reports]).
+* Отчёт по прогону сформирован (xref:testing/test-report.adoc#_результаты[Test report]).
 
 == Окружения
 
-Подробный чек-лист — на странице xref:testing/checklists.adoc[Чек-листы].
+Подробный чек-лист — на странице xref:testing/checklists.adoc#_cross_browser_адаптив_чеклист[Чек-листы].
 Минимальный набор:
 
 * Chrome (последняя стабильная), Windows 11;
@@ -83,9 +83,9 @@ xref:testing/test-cases/lead-status.adoc[Status]
 
 * **UI не реализован физически.** Тест-кейсы написаны как спецификация
   ожидаемого поведения интерфейса на основе OpenAPI-контракта. Это допущение
-  явно зафиксировано в xref:testing/overview.adoc[Обзоре].
+  явно зафиксировано в xref:testing/overview.adoc#_объект_тестирования[Обзоре].
 * **API может быть недоступен.** Для UI-кейсов это не блокер — проверяется
   отображение ошибок сети.
 * **Rate limiting (429).** Тесты учитывают лимит 120 req/min
-  (xref:api/overview.adoc[Rate limiting]); при flaky-результатах проверяется,
-  не превышен ли лимит.
+  (xref:api/overview.adoc#_rate_limiting[Rate limiting]); при flaky-результатах
+  проверяется, не превышен ли лимит.
