@@ -4,7 +4,7 @@
 `PATCH /leads/\{id\}` с полем `status`. Разрешённые переходы заданы диаграммой
 статусов в xref:api/endpoints/leads.adoc#_диаграмма_статусов[Leads API]:
 
-[source,mermaid]
+[mermaid]
 ....
 stateDiagram-v2
     [*] --> new : создание лида
