@@ -20,3 +20,5 @@ CRM Leads API — небольшой REST-сервис, позволяющий:
 * xref:guides/getting-started.adoc[Быстрый старт] — первый запрос за 5 минут.
 * xref:guides/authentication.adoc[Аутентификация] — как работать с токенами.
 * xref:api/overview.adoc[Обзор API] — общие сведения и список эндпоинтов.
+* xref:testing/overview.adoc[Тестирование] — тест-кейсы, чек-листы и отчёты по
+  условному веб-интерфейсу поверх CRM Leads API.
