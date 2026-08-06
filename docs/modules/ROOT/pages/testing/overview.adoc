@@ -64,15 +64,15 @@ xref:testing/checklists.adoc#_cross_browser_адаптив_чеклист[Чек
 
 | `POST /auth/token`
 | Форма логина
-| TC-AUTH-01…05
+| TC-AUTH-01…06
 
 | `GET /leads`, query `status`/`page`/`pageSize`
 | Список лидов (фильтр, пагинация)
-| TC-LIST-01…08
+| TC-LIST-01…09
 
 | `POST /leads`
 | Форма создания лида
-| TC-FORM-01…10
+| TC-FORM-01…11
 
 | `PATCH /leads/{id}` (статус)
 | Смена статуса в карточке

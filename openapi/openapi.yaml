@@ -130,8 +130,6 @@ paths:
                 totalItems: 1
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "429":
           $ref: "#/components/responses/RateLimited"
     post:
@@ -185,8 +183,6 @@ paths:
                       field: "fullName"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "409":
           description: Конфликт (дубликат email)
           content:
@@ -224,8 +220,6 @@ paths:
                 updatedAt: "2026-07-20T10:15:00Z"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "404":
           description: Лид не найден
           content:
@@ -281,8 +275,6 @@ paths:
                   field: "status"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "404":
           description: Лид не найден
           content:
@@ -317,8 +309,6 @@ paths:
           description: Лид удалён
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "403":
-          $ref: "#/components/responses/Forbidden"
         "404":
           description: Лид не найден
           content:
