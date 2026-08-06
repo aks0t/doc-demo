@@ -7,23 +7,51 @@
 
 ## [Unreleased]
 
-### Изменено
-
-- Задокументирован rate limiting: лимит 120 запросов в минуту на клиента, заголовки `X-RateLimit-*` и `Retry-After` (см. `api/overview.adoc`).
-- В `guides/authentication.adoc` добавлен раздел «Права доступа»: уточнено, что в текущей версии API все токены имеют полный доступ, `403 Forbidden` зарезервирован под будущее разделение прав.
-
-### Исправлено
-
-- `openapi.yaml` и `leads.adoc`: для `PATCH /leads/{id}` задокументирован ответ `409 Conflict` с кодом `invalid_status_transition`, который ранее был определён в enum, но не описан как ответ операции.
-- `leads.adoc`: добавлен пример ошибки валидации для недопустимого значения `source` в `POST /leads`.
-- `openapi.yaml`: поле `source` добавлено в схему `LeadUpdateRequest` — теперь обновление источника лида описано в спеке.
-- `auth.adoc`: явно указан grant type `client_credentials` (OAuth 2.0 Client Credentials) — ранее точная формулировка была только в глоссарии.
-
 ### Планируется
 
 - Расширение набора use-case документации.
 - Улучшение автоматической генерации документации из OpenAPI.
-- Раздел «Тестирование» (тест-кейсы, чек-листы, баг-репорты) — в разработке.
+
+## [1.1.0] — 2026-08-06
+
+### Добавлено
+
+- Раздел «Тестирование»: обзор подхода (`testing/overview.adoc`), test plan,
+  тест-кейсы (auth, список лидов, форма, смена статуса), примеры баг-репортов
+  с объяснением Severity/Priority, чек-листы (smoke/regression/cross-browser)
+  и итоговый отчёт по прогону.
+- Стандарт оформления тест-кейсов (`standarts/test-case-standart.adoc`):
+  схема ID `TC-<ОБЛАСТЬ>-<номер>`, обязательные колонки, правила для
+  баг-репортов и чек-листов.
+- Postman smoke-коллекция `qa/api-tests/crm-leads-smoke.postman_collection.json`
+  с тестами на ключевые сценарии контракта (токен, создание лида,
+  `409 duplicate_email`, `404 lead_not_found`, `409 invalid_status_transition`,
+  фильтрация).
+- Глоссарий дополнен QA-терминами: Test Case, Bug Report, Severity, Priority,
+  Smoke- и Regression-тестирование.
+
+### Изменено
+
+- Задокументирован rate limiting: лимит 120 запросов в минуту на клиента,
+  заголовки `X-RateLimit-*` и `Retry-After` (см. `api/overview.adoc`).
+- В `guides/authentication.adoc` добавлен раздел «Права доступа»: уточнено,
+  что в текущей версии API все токены имеют полный доступ, `403 Forbidden`
+  зарезервирован под будущее разделение прав.
+- README перепозиционирован: проект представлен как пример документирования
+  и тестирования продукта по принципу Docs-as-Code.
+
+### Исправлено
+
+- `openapi.yaml` и `leads.adoc`: для `PATCH /leads/{id}` задокументирован
+  ответ `409 Conflict` с кодом `invalid_status_transition`, который ранее был
+  определён в enum, но не описан как ответ операции.
+- `leads.adoc`: добавлен пример ошибки валидации для недопустимого значения
+  `source` в `POST /leads`.
+- `openapi.yaml`: поле `source` добавлено в схему `LeadUpdateRequest` — теперь
+  обновление источника лида описано в спеке.
+- `auth.adoc`: явно указан grant type `client_credentials`
+  (OAuth 2.0 Client Credentials) — ранее точная формулировка была только в
+  глоссарии.
 
 ## [1.0.0] — 2026-07-30
 
@@ -49,5 +77,6 @@
 - Устранены расхождения между OpenAPI-спекой и ручной документацией.
 - Исправлены примеры ошибок API.
 
-[Unreleased]: https://github.com/aks0t/doc-demo/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/aks0t/doc-demo/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/aks0t/doc-demo/releases/tag/v1.1.0
 [1.0.0]: https://github.com/aks0t/doc-demo/releases/tag/v1.0.0
